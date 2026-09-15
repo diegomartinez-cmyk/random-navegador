@@ -1,24 +1,10 @@
-{
-  "name": "random-browser",
-  "version": "1.0.0",
-  "description": "Mi navegador web",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron .",
-    "build": "electron-builder"
+"build": {
+  "appId": "com.randombrowser.app",
+  "productName": "Random Browser",
+  "publish": null,
+  "win": {
+    "target": "nsis"
   },
-  "devDependencies": {
-    "electron": "^38.0.0",
-    "electron-builder": "^26.0.12"
-  },
-  "build": {
-    "appId": "com.randombrowser.app",
-    "productName": "Random Browser",
-    "win": {
-      "target": "nsis"
-    },
-    "linux": {
-      "target": "AppImage"
-    }
+  "linux": {
+    "target": "AppImage"
   }
-}
