@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Random Browser</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111827;
+    color: white;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#toolbar {
+    height: 60px;
+    background: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px;
+}
+
+button {
+    border: none;
+    border-radius: 9px;
+    padding: 9px 13px;
+    background: #374151;
+    color: white;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #4b5563;
+}
+
+#address {
+    flex: 1;
+    height: 40px;
+    border-radius: 22px;
+    border: 1px solid #4b5563;
+    background: #111827;
+    color: white;
+    padding: 0 16px;
+    font-size: 15px;
+    outline: none;
+}
+
+#tabs {
+    height: 38px;
+    background: #111827;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+}
+
+.tab {
+    background: #374151;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+#home {
+    height: calc(100vh - 98px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#home h1 {
+    font-size: 48px;
+    margin: 0 0 10px;
+}
+
+#home p {
+    color: #9ca3af;
+}
+
+#searchBox {
+    width: min(700px, 90%);
+    display: flex;
+    gap: 8px;
+}
+
+#search {
+    flex: 1;
+    height: 50px;
+    border-radius: 25px;
+    border: 1px solid #4b5563;
+    background: #1f2937;
+    color: white;
+    padding: 0 20px;
+    font-size: 17px;
+    outline: none;
+}
+
+#searchButton {
+    border-radius: 25px;
+    padding: 0 22px;
+    background: #4f46e5;
+}
+
+.quick {
+    margin-top: 20px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.quick button {
+    background: #4f46e5;
+}
+
+#webview {
+    width: 100%;
+    height: calc(100vh - 98px);
+    border: none;
+    display: none;
+}
+
+#status {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: #0b1220;
+    color: #9ca3af;
+    font-size: 11px;
+    padding-left: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="toolbar">
+
+    <button onclick="goBack()">←</button>
+    <button onclick="goForward()">→</button>
+    <button onclick="reloadPage()">⟳</button>
+    <button onclick="goHome()">⌂</button>
+
+    <input
+        id="address"
+        placeholder="Escribe una dirección o busca..."
+        onkeydown="addressEnter(event)"
+    >
+
+    <button onclick="navigate()">Ir</button>
+
+</div>
+
+<div id="tabs">
+    <div class="tab">🌐 Random Browser</div>
+</div>
+
+<div id="home">
+
+    <h1>🌐 Random Browser</h1>
+
+    <p>
+        Busca en Internet o escribe una dirección web.
+    </p>
+
+    <div id="searchBox">
+
+        <input
+            id="search"
+            placeholder="Buscar en Google..."
+            onkeydown="searchEnter(event)"
+        >
+
+        <button
+            id="searchButton"
+            onclick="searchWeb()"
+        >
+            🔎 Buscar
+        </button>
+
+    </div>
+
+    <div class="quick">
+
+        <button onclick="openSite('https://www.google.com')">
+            Google
+        </button>
+
+        <button onclick="openSite('https://www.youtube.com')">
+            YouTube
+        </button>
+
+        <button onclick="openSite('https://www.roblox.com')">
+            Roblox
+        </button>
+
+        <button onclick="openSite('https://www.instagram.com')">
+            Instagram
+        </button>
+
+        <button onclick="openSite('https://www.tiktok.com')">
+            TikTok
+        </button>
+
+    </div>
+
+</div>
+
+<webview
+    id="webview"
+    allowpopups
+    partition="persist:random-browser">
+</webview>
+
+<div id="status">
+    Listo
+</div>
+
+<script>
+
+const webview = document.getElementById("webview");
+const home = document.getElementById("home");
+const address = document.getElementById("address");
+const status = document.getElementById("status");
+
+function convertURL(value) {
+
+    value = value.trim();
+
+    if (!value) {
+        return null;
+    }
+
+    if (value.startsWith("http://") ||
+        value.startsWith("https://")) {
+
+        return value;
+
+    }
+
+    if (value.includes(".") &&
+        !value.includes(" ")) {
+
+        return "https://" + value;
+
+    }
+
+    return "https://www.google.com/search?q=" +
+           encodeURIComponent(value);
+}
+
+function openSite(url) {
+
+    home.style.display = "none";
+    webview.style.display = "block";
+
+    address.value = url;
+
+    webview.src = url;
+
+    status.textContent = "Cargando...";
+}
+
+function navigate() {
+
+    const url = convertURL(address.value);
+
+    if (url) {
+        openSite(url);
+    }
+}
+
+function searchWeb() {
+
+    const query = document.getElementById("search").value;
+
+    if (!query.trim()) {
+        return;
+    }
+
+    openSite(
+        "https://www.google.com/search?q=" +
+        encodeURIComponent(query)
+    );
+}
+
+function addressEnter(event) {
+
+    if (event.key === "Enter") {
+        navigate();
+    }
+}
+
+function searchEnter(event) {
+
+    if (event.key === "Enter") {
+        searchWeb();
+    }
+}
+
+function goBack() {
+
+    if (webview.canGoBack()) {
+        webview.goBack();
+    }
+}
+
+function goForward() {
+
+    if (webview.canGoForward()) {
+        webview.goForward();
+    }
+}
+
+function reloadPage() {
+
+    webview.reload();
+}
+
+function goHome() {
+
+    webview.style.display = "none";
+    home.style.display = "flex";
+    address.value = "";
+    status.textContent = "Inicio";
+}
+
+webview.addEventListener(
+    "did-start-loading",
+    () => {
+        status.textContent = "Cargando...";
+    }
+);
+
+webview.addEventListener(
+    "did-stop-loading",
+    () => {
+
+        address.value = webview.getURL();
+
+        status.textContent =
+            webview.getTitle() || "Página cargada";
+    }
+);
+
+webview.addEventListener(
+    "did-navigate",
+    () => {
+        address.value = webview.getURL();
+    }
+);
+
+webview.addEventListener(
+    "new-window",
+    event => {
+        openSite(event.url);
+    }
+);
+
+</script>
+
+</body>
+</html>
